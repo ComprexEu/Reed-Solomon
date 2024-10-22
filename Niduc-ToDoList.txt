@@ -1,0 +1,5 @@
+1 Stworzyć klasę ciała Galois
+2 Napisać kod do generacji tablic do policzenia postaci wektorowej i wykładniczej w osobnych klasach - tabliczka mnożenia i odejmowania
+będą zapisane w postaci jakiegoś pliku
+3 Koder
+4 Dekoder (co to znaczy uproszczony dekoder)
