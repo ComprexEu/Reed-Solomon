@@ -3,15 +3,16 @@ class GaloisField:
     FIELD_SIZE = 32  # GF(2^5) - 32 elementy
 
     def __init__(self):
-        # Inicjalizacja słownika mapującego elementy wektorowe i potęgi generatora
-        self.field_dict = {}  # Nie przechowujemy elementu zerowego
+        # Inicjalizacja słowników mapujących elementy wektorowe i potęgi generatora
+        self.exp_to_elem = {}  # Mapowanie potęgi na element wektorowy
+        self.elem_to_exp = {}  # Mapowanie elementu wektorowego na potęgę
         self._generate_field_dict()
 
     def _generate_field_dict(self):
         x = 1
         for i in range(self.FIELD_SIZE - 1):
-            self.field_dict[i] = x  # Mapowanie potęgi do elementu wektorowego
-            self.field_dict[x] = i  # Mapowanie elementu wektorowego do potęgi
+            self.exp_to_elem[i] = x  # Mapowanie potęgi do elementu wektorowego
+            self.elem_to_exp[x] = i  # Mapowanie elementu wektorowego do potęgi
             x <<= 1  # Mnożenie przez 2
             if x & self.FIELD_SIZE:  # Redukcja, jeśli x przekracza 5 bitów
                 x ^= self.PRIMITIVE_POLY
@@ -22,9 +23,11 @@ class GaloisField:
     def mul(self, a, b):
         if a == 0 or b == 0:
             return 0
-        # α^a + α^b = α^((a + b) mod 2^5 - 1)
-        return self.field_dict[(self.field_dict[a] + self.field_dict[b]) % (self.FIELD_SIZE - 1)]
+        # α^a * α^b = α^((elem_to_exp[a] + elem_to_exp[b]) mod (2^5 - 1))
+        exp_sum = (self.elem_to_exp[a] + self.elem_to_exp[b]) % (self.FIELD_SIZE - 1)
+        return self.exp_to_elem[exp_sum]
 
 
+# Testowanie
 gf = GaloisField()
-gf.field_dict
+gf.exp_to_elem, gf.elem_to_exp
