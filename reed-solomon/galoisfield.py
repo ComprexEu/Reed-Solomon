@@ -4,8 +4,8 @@ class GaloisField:
 
     def __init__(self):
         # Inicjalizacja słowników mapujących elementy wektorowe i potęgi generatora
-        self.exp_to_elem = {}  # Mapowanie potęgi na element wektorowy
-        self.elem_to_exp = {}  # Mapowanie elementu wektorowego na potęgę
+        self.exp_to_elem = {}
+        self.elem_to_exp = {}
         self._generate_field_dict()
 
     def _generate_field_dict(self):
