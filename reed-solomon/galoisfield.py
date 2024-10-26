@@ -16,6 +16,15 @@ class GaloisField:
             if x & self.FIELD_SIZE:  # Redukcja, jeśli x przekracza 5 bitów
                 x ^= self.PRIMITIVE_POLY
 
+    def add(self, a, b):
+        return a ^ b
+
+    def mul(self, a, b):
+        if a == 0 or b == 0:
+            return 0
+        # α^a + α^b = α^((a + b) mod 2^5 - 1)
+        return self.field_dict[(self.field_dict[a] + self.field_dict[b]) % (self.FIELD_SIZE - 1)]
+
 
 gf = GaloisField()
 gf.field_dict
