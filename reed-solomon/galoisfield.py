@@ -23,11 +23,6 @@ class GaloisField:
     def mul(self, a, b):
         if a == 0 or b == 0:
             return 0
-        # α^a * α^b = α^((elem_to_exp[a] + elem_to_exp[b]) mod (2^5 - 1))
+        # α^x * α^y = α^((x + y) mod (2^5 - 1))
         exp_sum = (self.elem_to_exp[a] + self.elem_to_exp[b]) % (self.FIELD_SIZE - 1)
         return self.exp_to_elem[exp_sum]
-
-
-# Testowanie
-gf = GaloisField()
-gf.exp_to_elem, gf.elem_to_exp
