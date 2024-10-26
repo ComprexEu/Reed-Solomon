@@ -1,16 +1,21 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from galoisfield import GaloisField
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+class Main:
+    def __init__(self):
+        self.gf = GaloisField()
+
+    def main(self):
+        # Przykładowe elementy do dodawania i mnożenia
+        a = 30
+        b = 10
+
+        sum_result = self.gf.add(a, b)
+        print(sum_result)
+        mul_result = self.gf.mul(a, b)
+        print(mul_result)
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+if __name__ == "__main__":
+    main = Main()
+    main.main()
