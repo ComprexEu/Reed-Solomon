@@ -28,9 +28,10 @@ class Main:
         for i in range(len(result2)):
             print(self.gf.exp_to_elem[result2[i]])
 
-        print(self.gf.poly_mod([0,1,0,1,0,0,0], [0,6,1,6]))
-        #print(self.rs.generate_generator_poly())
-        #print(self.rs.encode(result2))
+        print(self.gf.poly_mod([0, 1, 0, 1, float('-inf'), float('-inf'), float('-inf')], [0, 6, 1, 6]))
+        # print(self.rs.generate_generator_poly())
+        # print(self.rs.encode(result2))
+
 
 if __name__ == "__main__":
     main = Main()

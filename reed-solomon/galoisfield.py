@@ -1,6 +1,6 @@
 class GaloisField:
-    PRIMITIVE_POLY = 0b100101  # Wielomian pierwotny x^5 + x^2 + 1
-    FIELD_SIZE = 32  # GF(2^5) - 32 elementy
+    PRIMITIVE_POLY = 0b1011  # Wielomian pierwotny x^5 + x^2 + 1
+    FIELD_SIZE = 8  # GF(2^5) - 32 elementy
 
     def __init__(self):
         # Inicjalizacja słowników mapujących elementy wektorowe i potęgi generatora
@@ -16,6 +16,8 @@ class GaloisField:
             x <<= 1  # Mnożenie przez 2
             if x & self.FIELD_SIZE:  # Redukcja, jeśli x przekracza 5 bitów
                 x ^= self.PRIMITIVE_POLY
+        self.exp_to_elem[float('-inf')] = 0
+        self.elem_to_exp[0] = float('-inf')
 
     def add(self, a, b):
         return a ^ b
@@ -42,23 +44,13 @@ class GaloisField:
     def poly_mod(self, p, q):
         q_deg = len(q)
         r = p[:]
-        while (len(r) >= q_deg) != 0:
-            added_value = self.add(self.exp_to_elem[r[0]], self.exp_to_elem[q[0]])
-
-            if added_value != 0:
-                factor = self.elem_to_exp[added_value]
-            else:
-                factor = 1
+        while len(r) >= q_deg:
+            factor = self.mul(self.exp_to_elem[r[0]], self.exp_to_elem[q[0]])
 
             for i in range(q_deg):
-                term = self.mul(factor, q[i])
-                added_value = self.add(self.exp_to_elem[r[i]], self.exp_to_elem[term])
-
-                if added_value != 0:
-                    r[i] = self.elem_to_exp[added_value]
-                else:
-                    r[i] = 0
-                #r = self.elem_to_exp[self.add(self.exp_to_elem[r[i]], self.exp_to_elem[term])]
+                term = self.mul(factor, self.exp_to_elem[q[i]])
+                added_value = self.add(self.exp_to_elem[r[i]], term)
+                r[i] = self.elem_to_exp[added_value]
 
             r.pop(0)
         return r
