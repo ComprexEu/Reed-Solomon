@@ -38,3 +38,27 @@ class GaloisField:
             result[i] = self.elem_to_exp[result[i]]
 
         return result
+
+    def poly_mod(self, p, q):
+        q_deg = len(q)
+        r = p[:]
+        while (len(r) >= q_deg) != 0:
+            added_value = self.add(self.exp_to_elem[r[0]], self.exp_to_elem[q[0]])
+
+            if added_value != 0:
+                factor = self.elem_to_exp[added_value]
+            else:
+                factor = 1
+
+            for i in range(q_deg):
+                term = self.mul(factor, q[i])
+                added_value = self.add(self.exp_to_elem[r[i]], self.exp_to_elem[term])
+
+                if added_value != 0:
+                    r[i] = self.elem_to_exp[added_value]
+                else:
+                    r[i] = 0
+                #r = self.elem_to_exp[self.add(self.exp_to_elem[r[i]], self.exp_to_elem[term])]
+
+            r.pop(0)
+        return r
