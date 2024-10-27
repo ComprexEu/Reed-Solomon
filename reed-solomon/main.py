@@ -1,9 +1,11 @@
 from galoisfield import GaloisField
+from reedsolomon import ReedSolomon
 
 
 class Main:
     def __init__(self):
         self.gf = GaloisField()
+        self.rs = ReedSolomon(10)
 
     def main(self):
         # Przykładowe elementy do dodawania i mnożenia
@@ -23,6 +25,7 @@ class Main:
         print(result2)
         for i in range(len(result2)):
             print(self.gf.exp_to_elem[result2[i]])
+        print(self.rs.generate_generator_poly())
 
 
 if __name__ == "__main__":
