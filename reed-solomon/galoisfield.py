@@ -26,3 +26,15 @@ class GaloisField:
         # α^x * α^y = α^((x + y) mod (2^5 - 1))
         exp_sum = (self.elem_to_exp[a] + self.elem_to_exp[b]) % (self.FIELD_SIZE - 1)
         return self.exp_to_elem[exp_sum]
+
+    def poly_multiply(self, p, q):
+        result = [0] * (len(p) + len(q) - 1)
+
+        for i in range(len(p)):
+            for j in range(len(q)):
+                result[i + j] ^= self.mul(self.exp_to_elem[p[i]], self.exp_to_elem[q[j]])
+
+        for i in range(len(result)):
+            result[i] = self.elem_to_exp[result[i]]
+
+        return result
