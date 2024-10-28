@@ -1,7 +1,7 @@
 class GaloisField:
     PRIMITIVE_POLY = 0b1011  # Wielomian pierwotny x^5 + x^2 + 1
     FIELD_SIZE = 8  # GF(2^5) - 32 elementy
-
+    m = 3 # GF(2^m)
     def __init__(self):
         # Inicjalizacja słowników mapujących elementy wektorowe i potęgi generatora
         self.exp_to_elem = {}
