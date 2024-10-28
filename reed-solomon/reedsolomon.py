@@ -18,10 +18,7 @@ class ReedSolomon:
     def encode(self, message):
         info_poly = message + [float('-inf')] * (self.n - self.k)
         control_poly = self.gf.poly_mod(info_poly, self.generator_poly)
-
-        encoded_message = info_poly
-        for i in range(0, len(control_poly)):
-            encoded_message[len(info_poly) - len(control_poly) + i] = control_poly[i]
+        encoded_message = info_poly[:self.k] + control_poly
         return encoded_message
 
     def decode(self, encoded_message):
