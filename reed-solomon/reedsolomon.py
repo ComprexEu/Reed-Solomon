@@ -5,8 +5,8 @@ class ReedSolomon:
     def __init__(self, t, n, k):
         self.t = t  # liczba błędów do korekcji
         self.gf = GaloisField()  # instancja klasy GaloisField
-        self.n = n  # Długość wiadomości
-        self.k = k  # ilość bitów informacyjnych
+        self.n = n  # długość wiadomości
+        self.k = k  # liczba bitów informacyjnych
         self.generator_poly = self.generate_generator_poly()  # wielomian generujący
 
     def generate_generator_poly(self):
@@ -25,13 +25,15 @@ class ReedSolomon:
         return encoded_message
 
     def decode(self, encoded_message):
-        syndrom = [float('-inf')] * (len(encoded_message) - len(self.generator_poly) + 1)\
-                 + self.gf.poly_mod(encoded_message, self.generator_poly)
+        syndrom = self.gf.poly_mod(encoded_message, self.generator_poly)
+        syndrom = [float('-inf')] * (len(encoded_message) - len(syndrom)) + syndrom
         decoded_message = encoded_message
         # co robić w przypadku, gdy jest większa liczba błedów w pakiecie, jak złapać taki wyjątek
         syndrom_weight = 0
+
         for i in range(0, len(syndrom)):
-            syndrom_weight = syndrom_weight + self.gf.exp_to_elem[syndrom[i]]
+            if self.gf.exp_to_elem[syndrom[i]] > 0:
+                syndrom_weight += 1
 
         if self.t >= syndrom_weight > 0:
             for i in range(0, self.n):
