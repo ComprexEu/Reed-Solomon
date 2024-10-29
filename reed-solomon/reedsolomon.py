@@ -22,20 +22,36 @@ class ReedSolomon:
         return encoded_message
 
     def decode(self, encoded_message):
-        syndrom = self.gf.poly_mod(encoded_message, self.generator_poly)
-        syndrom = [float('-inf')] * (len(encoded_message) - len(syndrom)) + syndrom
-        decoded_message = encoded_message
         # co robić w przypadku, gdy jest większa liczba błedów w pakiecie, jak złapać taki wyjątek
-        syndrom_weight = 0
+        iterator = 0
+        decoded_message = encoded_message
+        while iterator < self.k:
 
-        for i in range(0, len(syndrom)):
-            if self.gf.exp_to_elem[syndrom[i]] > 0:
-                syndrom_weight += 1
+            #tworzenie syndromu
+            syndrom = self.gf.poly_mod(decoded_message, self.generator_poly)
+            syndrom = [float('-inf')] * (len(encoded_message) - len(syndrom)) + syndrom
 
-        if self.t >= syndrom_weight > 0:
-            for i in range(0, self.n):
-                decoded_message[i] = self.gf.elem_to_exp[self.gf.add(self.gf.exp_to_elem[syndrom[i]],
+            syndrom_weight = 0 # waga syndromu, to ilosc wszystkich nie zerowych elementów w syndromie
+            for i in range(0, len(syndrom)):
+                if self.gf.exp_to_elem[syndrom[i]] > 0:
+                    syndrom_weight += 1
+
+            if self.t >= syndrom_weight > 0:
+                for i in range(0, self.n):
+                    decoded_message[i] = self.gf.elem_to_exp[self.gf.add(self.gf.exp_to_elem[syndrom[i]],
                                                                      self.gf.exp_to_elem[encoded_message[i]])]
-            return decoded_message
-        elif syndrom_weight == 0:
-            return decoded_message
+
+                #przesunięcie cykliczne w lewo do pierwotenj postaci
+                for i in range(0, iterator):
+                    decoded_message.append(decoded_message[0])
+                    decoded_message.pop(0)
+
+                return decoded_message
+            elif syndrom_weight == 0:
+                return decoded_message
+
+            # przesunięcie cykliczne w prawo - dodanie zer z lewej strony
+            decoded_message.insert(0, decoded_message[self.n - 1])
+            decoded_message.pop(len(decoded_message) - 1)
+
+            iterator += 1
