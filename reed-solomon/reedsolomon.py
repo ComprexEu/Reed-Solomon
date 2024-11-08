@@ -27,17 +27,17 @@ class ReedSolomon:
         while iterator < self.n:
 
             # tworzenie syndromu
-            syndrom = self.gf.poly_mod(decoded_message, self.generator_poly)
-            syndrom = [float('-inf')] * (len(encoded_message) - len(syndrom)) + syndrom
+            syndrome = self.gf.poly_mod(decoded_message, self.generator_poly)
+            syndrome = [float('-inf')] * (len(encoded_message) - len(syndrome)) + syndrome
 
-            syndrom_weight = 0  # waga syndromu, to ilosc wszystkich nie zerowych elementów w syndromie
-            for i in range(0, len(syndrom)):
-                if self.gf.exp_to_elem[syndrom[i]] > 0:
-                    syndrom_weight += 1
+            syndrome_weight = 0  # waga syndromu, to ilosc wszystkich nie zerowych elementów w syndromie
+            for i in range(0, len(syndrome)):
+                if self.gf.exp_to_elem[syndrome[i]] > 0:
+                    syndrome_weight += 1
 
-            if self.t >= syndrom_weight > 0:
+            if self.t >= syndrome_weight > 0:
                 for i in range(0, self.n):
-                    decoded_message[i] = self.gf.add(syndrom[i], encoded_message[i])
+                    decoded_message[i] = self.gf.add(syndrome[i], encoded_message[i])
 
                 # przesunięcie cykliczne w lewo do pierwotenj postaci
                 for i in range(0, iterator):
@@ -45,7 +45,7 @@ class ReedSolomon:
                     decoded_message.pop(0)
 
                 return decoded_message
-            elif syndrom_weight == 0:
+            elif syndrome_weight == 0:
                 return decoded_message
 
             # przesunięcie cykliczne w prawo - dodanie zer z lewej strony
