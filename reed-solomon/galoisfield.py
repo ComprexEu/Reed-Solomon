@@ -20,37 +20,40 @@ class GaloisField:
         self.elem_to_exp[0] = float('-inf')
 
     def add(self, a, b):
-        return a ^ b
+        return self.elem_to_exp[self.exp_to_elem[a] ^ self.exp_to_elem[b]]
 
     def mul(self, a, b):
-        if a == 0 or b == 0:
-            return 0
-        # α^x * α^y = α^((x + y) mod (2^5 - 1))
-        exp_sum = (self.elem_to_exp[a] + self.elem_to_exp[b]) % (self.FIELD_SIZE - 1)
-        return self.exp_to_elem[exp_sum]
+        if a == float('-inf') or b == float('-inf'):
+            return float('-inf')
+        return (a + b) % (self.FIELD_SIZE - 1)
+
+    def div(self, a, b):
+        if a == float('-inf'):
+            return float('-inf')
+        if b == float('-inf'):
+            raise ZeroDivisionError
+        return (a - b) % (self.FIELD_SIZE - 1)
 
     def poly_multiply(self, p, q):
         result = [0] * (len(p) + len(q) - 1)
 
         for i in range(len(p)):
             for j in range(len(q)):
-                result[i + j] ^= self.mul(self.exp_to_elem[p[i]], self.exp_to_elem[q[j]])
+                result[i + j] ^= self.exp_to_elem[self.mul(p[i], q[j])]
 
         for i in range(len(result)):
             result[i] = self.elem_to_exp[result[i]]
-
         return result
 
     def poly_mod(self, p, q):
         q_deg = len(q)
         r = p[:]
         while len(r) >= q_deg:
-            factor = self.mul(self.exp_to_elem[r[0]], self.exp_to_elem[q[0]])
+            factor = self.div(r[0], q[0])
 
             for i in range(q_deg):
-                term = self.mul(factor, self.exp_to_elem[q[i]])
-                added_value = self.add(self.exp_to_elem[r[i]], term)
-                r[i] = self.elem_to_exp[added_value]
+                term = self.mul(factor, q[i])
+                r[i] = self.add(r[i], term)
 
             r.pop(0)
         return r
