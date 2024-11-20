@@ -29,6 +29,7 @@ class ReedSolomon:
 
             # tworzenie syndromu
             syndrome = self.gf.poly_mod(decoded_message, self.generator_poly)
+
             syndrome = [float('-inf')] * (len(encoded_message) - len(syndrome)) + syndrome
 
             syndrome_weight = 0  # waga syndromu, to ilosc wszystkich nie zerowych elementów w syndromie
