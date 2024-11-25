@@ -2,6 +2,7 @@ from galoisfield import GaloisField
 from reedsolomon import ReedSolomon
 import random
 
+
 def encode_test(message):
     reed_solomon = ReedSolomon(31,11)
     return reed_solomon.encode(message)

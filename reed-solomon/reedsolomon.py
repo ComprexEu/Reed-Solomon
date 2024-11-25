@@ -1,4 +1,5 @@
 from galoisfield import GaloisField
+from gaussjordan import GaussJordan
 
 
 class ReedSolomon:
@@ -21,7 +22,7 @@ class ReedSolomon:
         encoded_message = info_poly[:self.k] + control_poly
         return encoded_message
 
-    def decode(self, encoded_message):
+    def simple_decode(self, encoded_message):
         # co robić w przypadku, gdy jest większa liczba błedów w pakiecie, jak złapać taki wyjątek
         iterator = 0
         decoded_message = encoded_message
@@ -55,3 +56,41 @@ class ReedSolomon:
             decoded_message.pop(len(decoded_message) - 1)
 
             iterator += 1
+
+    def construct_matrices(self, encoded_message):
+        left = []
+        right = []
+
+        for i in range(self.n):
+            ai = i
+            wi = encoded_message[i]
+
+            q = [float('-inf')] * (self.k + self.t)
+            e = [float('-inf')] * (self.t + 1)
+
+            for j in range(len(q)):  # współczynniki q
+                q[j] = self.gf.pow(ai, len(q) - j)
+            for j in range(len(e)):  # współczynniki e
+                e[j] = self.gf.pow(ai, len(e) - j)
+                e[j] = self.gf.mul(e[j], wi)
+            r = e[0]
+            e.pop(0)
+
+            left.append(q + e)
+            right.append(r)
+
+        return left, right
+
+    def solve_linear_system(self, left, right):
+        gj = GaussJordan(left, right)
+        gj.calculate()
+        Q = right[:self.k + self.t]
+        E = right[self.k + self.t:]
+        return Q, E
+
+    def berlekamp_welch_decode(self, Q, E):
+        decoded_message = self.gf.poly_div(Q, E)
+
+
+
+

@@ -34,6 +34,13 @@ class GaloisField:
             raise ZeroDivisionError
         return (a - b) % (self.FIELD_SIZE - 1)
 
+    def pow(self, a, n):
+        if n == 0:
+            return 0
+        for i in range(n - 1):
+            a = self.mul(a, a)
+        return a
+
     def poly_multiply(self, p, q):
         result = [0] * (len(p) + len(q) - 1)
 
@@ -57,3 +64,18 @@ class GaloisField:
 
             r.pop(0)
         return r
+
+    def poly_div(self, p, q):
+        q_deg = len(q)
+        r = p[:]
+        result = []
+        while len(r) >= q_deg:
+            factor = self.div(r[0], q[0])
+
+            for i in range(q_deg):
+                term = self.mul(factor, q[i])
+                r[i] = self.add(r[i], term)
+
+            r.pop(0)
+            result.append(factor)
+        return result[::-1]
