@@ -1,4 +1,3 @@
-from galoisfield import GaloisField
 from reedsolomon import ReedSolomon
 import random
 
@@ -48,10 +47,13 @@ def test_of_decoder(message, numbers_of_erros, neighbourhood,number_of_test):
             else:
                 number_of_failrules += 1
 
-            print(harmed_message)
-            print(decoded_message)
-            print("")
+            #print(harmed_message)
+            #print(decoded_message)
+            #print("")
     return number_of_failrules, number_of_undecodable
 
-num_of_f, num_of_und  = test_of_decoder([1,2,3,4,5,6,7,8,9,10,11],3,False,100)
-print(num_of_und)
+num_of_tests = 10000
+num_of_f, num_of_und  = test_of_decoder([1,2,3,4,5,6,7,8,9,10,11],4,False,num_of_tests)
+print("nieodkodowane",num_of_und)
+print("niepoprawnie odkodowane",num_of_f)
+print("poprawnie odkodowane", num_of_tests - num_of_f - num_of_und )
