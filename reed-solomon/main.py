@@ -9,7 +9,10 @@ class Main:
 
     def main(self):
         print(self.rs.encode([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]))
-        print(self.rs.decode(
+        print(self.rs.simple_decode(
+            [1, 2, 4, 4, 5, 5, 7, 8, 6, 6, 11, 16, 4, 16, 0, 8, 6, float('-inf'), 5, 25, 28, 9, 8, 25, 14, 28, 30, 21,
+             float('-inf'), 6, 30]))
+        print(self.rs.berlekamp_welch_decode(
             [1, 2, 4, 4, 5, 5, 7, 8, 6, 6, 11, 16, 4, 16, 0, 8, 6, float('-inf'), 5, 25, 28, 9, 8, 25, 14, 28, 30, 21,
              float('-inf'), 6, 30]))
         print(len([1, 2, 4, 4, 5, 6, 7, 8, 9, 10, 11, 26, 4, 16, 0, 8, 6, float('-inf'), 5, 25, 28, 9, 8, 25, 14, 28,

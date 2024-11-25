@@ -79,3 +79,10 @@ class GaloisField:
             r.pop(0)
             result.append(factor)
         return result[::-1]
+
+    def calculate_poly(self, p, x):
+        p_deg = len(p)
+        result = float('-inf')
+        for i in range(p_deg): # pi * x^i
+            result = self.add(result, self.mul(p[i],self.pow(x, i)))
+        return result

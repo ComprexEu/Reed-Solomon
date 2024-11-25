@@ -88,9 +88,25 @@ class ReedSolomon:
         E = right[self.k + self.t:]
         return Q, E
 
-    def berlekamp_welch_decode(self, Q, E):
-        decoded_message = self.gf.poly_div(Q, E)
+    def berlekamp_welch_decode(self, encoded_message):
 
+        left, right = self.construct_matrices(encoded_message)
 
+        Q, E = self.solve_linear_system(left, right)
 
+        message_polynomial = self.gf.poly_div(Q, E)
+        errors_to_correct = []
 
+        # znajdowanie miejsc błedów
+        for i in range(self.n):
+            potential_error = self.gf.calculate_poly(E, i)
+            errors_to_correct.append(potential_error)
+
+        # poprawianie błędów
+        decoded_message = encoded_message
+
+        for i in range(len(errors_to_correct)):
+            if errors_to_correct[i] != float('-inf'):
+                decoded_message[i] =  self.gf.calculate_poly(message_polynomial, errors_to_correct[i])
+
+        return decoded_message
