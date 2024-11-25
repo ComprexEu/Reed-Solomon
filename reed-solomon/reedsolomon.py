@@ -22,6 +22,7 @@ class ReedSolomon:
         return encoded_message
 
     def decode(self, encoded_message):
+        # co robić w przypadku, gdy jest większa liczba błedów w pakiecie, jak złapać taki wyjątek
         iterator = 0
         decoded_message = encoded_message
         while iterator < self.n:
