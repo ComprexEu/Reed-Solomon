@@ -11,6 +11,7 @@ def decode_test(message):
     return reed_solomon.decode(message)
 
 def random_number(forbiden_number):
+    #nie powtarza sie ta sama cyfra wmiejscu, w ktorym była przed uszkodzeniem
     number = forbiden_number
     while number == forbiden_number:
         number = random.randint(-1,30)
@@ -22,13 +23,13 @@ def get_error(encoded_message, numbers_of_erros, neighbourhood):
     message_length = len(encoded_message)
     if neighbourhood:
         #randint bierze ostatni wyraz
-        index = random.randint(0, message_length - 1 - numbers_of_erros)
+        index = random.randint(0, message_length - numbers_of_erros)
         for i in range(index,index + numbers_of_erros):
             encoded_message[i] = random_number(encoded_message[i])
     else:
+        # range nie bierze ostatniego wyrazu
+        list_of_indexes = list(range(0, message_length))
         for i in range(numbers_of_erros):
-            # range nie bierze ostatniego wyrazu
-            list_of_indexes = list(range(0,message_length))
             index = random.choice(list_of_indexes)
             encoded_message[index] = random_number(encoded_message[index])
             list_of_indexes.remove(index)
@@ -53,8 +54,8 @@ def test_of_decoder(message, numbers_of_erros, neighbourhood,number_of_test):
             #print("")
     return number_of_failrules, number_of_undecodable
 
-num_of_tests = 10000
-num_of_f, num_of_und  = test_of_decoder([1,2,3,4,5,6,7,8,9,10,11],4,False,num_of_tests)
+num_of_tests = 1000
+num_of_f, num_of_und  = test_of_decoder([1,2,3,4,5,6,7,8,9,10,11],7,False,num_of_tests)
 print("nieodkodowane",num_of_und)
 print("niepoprawnie odkodowane",num_of_f)
 print("poprawnie odkodowane", num_of_tests - num_of_f - num_of_und )
