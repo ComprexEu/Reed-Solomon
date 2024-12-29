@@ -1,6 +1,6 @@
 class GaloisField:
-    PRIMITIVE_POLY = 0b100101 # 0b1011 # 0b100101  # Wielomian pierwotny x^5 + x^2 + 1
-    FIELD_SIZE = 32 # 8 # 32  # GF(2^5) - 32 elementy
+    PRIMITIVE_POLY = 0b1011  # 0b100101  # Wielomian pierwotny x^5 + x^2 + 1
+    FIELD_SIZE = 8  # GF(2^5) - 32 elementy
 
     def __init__(self):
         # Inicjalizacja słowników mapujących elementy wektorowe i potęgi generatora
@@ -78,11 +78,11 @@ class GaloisField:
 
             r.pop(0)
             result.append(factor)
-        return result[::-1]
+        return result
 
     def calculate_poly(self, p, x):
-        p_deg = len(p)
+        p_deg = len(p) - 1
         result = float('-inf')
-        for i in range(p_deg): # pi * x^i
-            result = self.add(result, self.mul(p[i],self.pow(x, i)))
+        for i in range(p_deg + 1):  # pi * x^i
+            result = self.add(result, self.mul(p[i], self.pow(x, p_deg - i)))
         return result

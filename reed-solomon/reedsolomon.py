@@ -57,27 +57,37 @@ class ReedSolomon:
 
             iterator += 1
 
-    def construct_matrices(self, encoded_message):
+    def encode_as_evaluations(self, message):
+        encoded = []
+        for x in range(self.n):
+            encoded.append(self.gf.calculate_poly(message, x))
+        return encoded
+
+    def construct_matrices(self, received_message):
+        print("RECEIVED MESSAGE ", received_message)
         left = []
         right = []
 
         for i in range(self.n):
             ai = i
-            wi = encoded_message[i]
+            wi = received_message[i]
 
             q = [float('-inf')] * (self.k + self.t)
             e = [float('-inf')] * (self.t + 1)
 
             for j in range(len(q)):  # współczynniki q
-                q[j] = self.gf.pow(ai, len(q) - j)
+                q[j] = self.gf.pow(ai, len(q) - j - 1)
             for j in range(len(e)):  # współczynniki e
-                e[j] = self.gf.pow(ai, len(e) - j)
+                e[j] = self.gf.pow(ai, len(e) - j - 1)
                 e[j] = self.gf.mul(e[j], wi)
             r = e[0]
             e.pop(0)
 
             left.append(q + e)
             right.append(r)
+
+        print("RIGHT MATRIX", right)
+        print("LEFT MATRIX", left)
 
         return left, right
 
@@ -88,25 +98,32 @@ class ReedSolomon:
         E = right[self.k + self.t:]
         return Q, E
 
-    def berlekamp_welch_decode(self, encoded_message):
+    def berlekamp_welch_decode(self, received_message):
 
-        left, right = self.construct_matrices(encoded_message)
+        left, right = self.construct_matrices(received_message)
 
         Q, E = self.solve_linear_system(left, right)
+        print("SOLVED LEFT MATRIX", left)
+        print("SOLVED RIGHT MATRIX", right)
+        E.insert(0, 0)
+        print("Q: ", Q)
+        print("E: ", E)
 
         message_polynomial = self.gf.poly_div(Q, E)
-        errors_to_correct = []
+        print(message_polynomial)
 
         # znajdowanie miejsc błedów
+        errors_to_correct = []
         for i in range(self.n):
             potential_error = self.gf.calculate_poly(E, i)
             errors_to_correct.append(potential_error)
 
         # poprawianie błędów
-        decoded_message = encoded_message
+        decoded_message = received_message
+        print("ERRORS TO CORRECT ", errors_to_correct)
 
         for i in range(len(errors_to_correct)):
-            if errors_to_correct[i] != float('-inf'):
-                decoded_message[i] =  self.gf.calculate_poly(message_polynomial, errors_to_correct[i])
+            if errors_to_correct[i] == float('-inf'):
+                decoded_message[i] = self.gf.calculate_poly(message_polynomial, errors_to_correct[i])
 
         return decoded_message
