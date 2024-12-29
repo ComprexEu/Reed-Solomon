@@ -9,7 +9,16 @@ class Main:
         self.rs = ReedSolomon(7, 3)
 
     def main(self):
-        print(self.gf.add(1, 0))
+        E = self.gf.calculate_poly([0, 4, 3], 6)
+        wiE = self.gf.mul(E, 2)
+        Q = self.gf.calculate_poly([1, 3, float('-inf'), 4, 6], 6)
+        print('E: ', E)
+        print('wi * E: ', wiE)
+        print('Q: ', Q)
+        print(self.gf.add(4, float('-inf')))
+        print(self.gf.mul(4, 6))
+        print(self.gf.pow(6, 4))
+        print(self.gf.mul(2, 5))
         print(self.gf.div(30, 3))
         print(self.gf.calculate_poly([1, 1], 1))
 
@@ -23,14 +32,6 @@ class Main:
         gauss_jordan = GaussJordan(left_matrix, right_matrix)
         gauss_jordan.calculate()
         print(right_matrix)
-
-        #print(self.rs.encode([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]))
-        #print(self.rs.simple_decode(
-            #[1, 2, 4, 4, 5, 6, 7, 8, 9, 10, 11, 26, 4, 16, 0, 8, 6, float('-inf'), 5, 25, 28, 9, 8, 25, 14, 28, 30, 21,
-             #float('-inf'), 6, 30]))
-        #print(self.rs.encode_as_evaluations([0, 0, 0, 4, 5, 6, 7, 5, 9, 10, 11]))
-        #print(self.rs.berlekamp_welch_decode(
-            #[18, 10, 15, 19, 21, 3, 2, 1, 9, 23, 13, 8, 3, 0, 4, 7, 6, 7, 8, 9, 10, 25, 2, 20, 26, 14, 30, 7, 28, 1, 12]))
 
         print("ENCODED MESSAGE ", self.rs.encode_as_evaluations([1, 2, 3]))
         print(self.rs.berlekamp_welch_decode([6, 5, 5, 6, 1, 2, 2]))

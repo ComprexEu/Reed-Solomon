@@ -37,8 +37,9 @@ class GaloisField:
     def pow(self, a, n):
         if n == 0:
             return 0
+        b = a
         for i in range(n - 1):
-            a = self.mul(a, a)
+            a = self.mul(a, b)
         return a
 
     def poly_multiply(self, p, q):

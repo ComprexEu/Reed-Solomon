@@ -124,6 +124,6 @@ class ReedSolomon:
 
         for i in range(len(errors_to_correct)):
             if errors_to_correct[i] == float('-inf'):
-                decoded_message[i] = self.gf.calculate_poly(message_polynomial, errors_to_correct[i])
+                decoded_message[i] = self.gf.calculate_poly(message_polynomial, i)
 
         return decoded_message

@@ -42,4 +42,5 @@ class GaussJordan:
 
                     # Update right matrix
                     self.rightmatrix[j] = self.gf.add(self.rightmatrix[j], self.gf.mul(self.rightmatrix[i], p))
-
+        print("SOLVED LEFT MATRIX", self.leftmatrix)
+        print("SOLVED RIGHT MATRIX", self.rightmatrix)
