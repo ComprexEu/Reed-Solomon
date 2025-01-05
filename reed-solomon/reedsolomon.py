@@ -1,5 +1,6 @@
 from galoisfield import GaloisField
 from gaussjordan import GaussJordan
+#import gaussjordan
 
 
 class ReedSolomon:
@@ -92,10 +93,9 @@ class ReedSolomon:
         return left, right
 
     def solve_linear_system(self, left, right):
-        gj = GaussJordan(left, right)
-        gj.calculate()
-        Q = right[:self.k + self.t]
-        E = right[self.k + self.t:]
+        rightmatrix =  GaussJordan.calculate(left, right)
+        Q = rightmatrix[:self.k + self.t] #
+        E = rightmatrix[self.k + self.t:] #?
         return Q, E
 
     def berlekamp_welch_decode(self, received_message):

@@ -29,8 +29,7 @@ class Main:
 
         right_matrix = [1, 2]
 
-        gauss_jordan = GaussJordan(left_matrix, right_matrix)
-        gauss_jordan.calculate()
+        GaussJordan.calculate(left_matrix, right_matrix)
         print(right_matrix)
 
         print("ENCODED MESSAGE ", self.rs.encode_as_evaluations([1, 2, 3]))

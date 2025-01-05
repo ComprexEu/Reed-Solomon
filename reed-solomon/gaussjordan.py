@@ -1,46 +1,45 @@
 from galoisfield import GaloisField
 
-
 class GaussJordan:
 
-    def __init__(self, leftmatrix, rightmatrix):
-        self.leftmatrix = leftmatrix  # Matrix of equations
-        self.n = len(self.leftmatrix)
-        self.rightmatrix = rightmatrix  # Solution matrix (1 x n)
-        self.gf = GaloisField()
+    @staticmethod
+    def calculate(leftmatrix, rightmatrix):
 
-    def calculate(self):
+        n= len(leftmatrix)
+        gf = GaloisField()
 
-        for i in range(self.n):
-            if self.leftmatrix[i][i] == float('-inf'):
+        for i in range(n):
+            if leftmatrix[i][i] == float('-inf'):
                 c = 1
-                while (i + c) < self.n and self.leftmatrix[i + c][i] == float('-inf'):
+                while (i + c) < n and leftmatrix[i + c][i] == float('-inf'):
                     c += 1
                 # If no non-zero element is found, end the algorithm
-                if (i + c) == self.n:
+                if (i + c) == n:
                     break
 
                 # Swap rows in the matrix
-                self.leftmatrix[i], self.leftmatrix[i+c] = self.leftmatrix[i+c], self.leftmatrix[i]
-                self.rightmatrix[i], self.rightmatrix[i+c] = self.rightmatrix[i+c], self.rightmatrix[i]
+                leftmatrix[i], leftmatrix[i+c] = leftmatrix[i+c], leftmatrix[i]
+                rightmatrix[i], rightmatrix[i+c] = rightmatrix[i+c], rightmatrix[i]
 
             # Normalize pivot row
-            pivot = self.leftmatrix[i][i]
+            pivot = leftmatrix[i][i]
             if pivot != float('-inf'):
-                for k in range(self.n):
-                    self.leftmatrix[i][k] = self.gf.div(self.leftmatrix[i][k], pivot)
-                self.rightmatrix[i] = self.gf.div(self.rightmatrix[i], pivot)
+                for k in range(n):
+                    leftmatrix[i][k] = gf.div(leftmatrix[i][k], pivot)
+                rightmatrix[i] = gf.div(rightmatrix[i], pivot)
 
-            for j in range(self.n):
+            for j in range(n):
                 if i != j:
                     # Calculate scaling factor
-                    p = self.gf.div(self.leftmatrix[j][i], self.leftmatrix[i][i])
+                    p = gf.div(leftmatrix[j][i], leftmatrix[i][i])
 
                     # Eliminate column entries
-                    for k in range(self.n):
-                        self.leftmatrix[j][k] = self.gf.add(self.leftmatrix[j][k], self.gf.mul(self.leftmatrix[i][k], p))
+                    for k in range(n):
+                        leftmatrix[j][k] = gf.add(leftmatrix[j][k], gf.mul(leftmatrix[i][k], p))
 
                     # Update right matrix
-                    self.rightmatrix[j] = self.gf.add(self.rightmatrix[j], self.gf.mul(self.rightmatrix[i], p))
-        print("SOLVED LEFT MATRIX", self.leftmatrix)
-        print("SOLVED RIGHT MATRIX", self.rightmatrix)
+                    rightmatrix[j] = gf.add(rightmatrix[j], gf.mul(rightmatrix[i], p))
+        print("SOLVED LEFT MATRIX", leftmatrix)
+        print("SOLVED RIGHT MATRIX", rightmatrix)
+
+        return rightmatrix
