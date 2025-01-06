@@ -8,7 +8,7 @@ class ReedSolomon:
         self.gf = GaloisField()  # instancja klasy GaloisField
         self.n = n  # długość wiadomości
         self.k = k  # liczba bitów informacyjnych
-        self.t = (self.n - self.k) // 2  # liczba błędów do korekcji
+        self.t = (self.n - self.k) // 2  # maksymalna liczba błędów do korekcji
         self.generator_poly = self.generate_generator_poly()  # wielomian generujący
 
     def generate_generator_poly(self):
@@ -64,17 +64,20 @@ class ReedSolomon:
             encoded.append(self.gf.calculate_poly(message, x))
         return encoded
 
-    def construct_matrices(self, received_message):
+    def construct_matrices(self, received_message, num_of_errors):
+
+        # num_of_errors - przy 10 błędach = 0, przy 9 błędach = 1 itd.
+
         print("RECEIVED MESSAGE ", received_message)
         left = []
         right = []
 
-        for i in range(self.n):
+        for i in range(self.n - 2*num_of_errors):
             ai = i
             wi = received_message[i]
 
-            q = [float('-inf')] * (self.k + self.t)
-            e = [float('-inf')] * (self.t + 1)
+            q = [float('-inf')] * (self.k + self.t - num_of_errors)
+            e = [float('-inf')] * (self.t + 1 - num_of_errors)
 
             for j in range(len(q)):  # współczynniki q
                 q[j] = self.gf.pow(ai, len(q) - j - 1)
@@ -92,17 +95,27 @@ class ReedSolomon:
 
         return left, right
 
-    def solve_linear_system(self, left, right):
+    def solve_linear_system(self, left, right, num_of_errors):
+
         rightmatrix =  GaussJordan.calculate(left, right)
-        Q = rightmatrix[:self.k + self.t] #
-        E = rightmatrix[self.k + self.t:] #?
+        Q = rightmatrix[:self.k + self.t - num_of_errors]
+        E = rightmatrix[self.k + self.t - num_of_errors:]
         return Q, E
 
     def berlekamp_welch_decode(self, received_message):
 
-        left, right = self.construct_matrices(received_message)
+        num_of_errors = 0
 
-        Q, E = self.solve_linear_system(left, right)
+        while True:
+            try:
+                left, right = self.construct_matrices(received_message, num_of_errors)
+                Q, E = self.solve_linear_system(left, right, num_of_errors)
+                break
+            except ValueError:
+                # gaussjordan jest nierozwiązywalny i spr. dla mniejszej liczby błędów
+                num_of_errors += 1
+
+
         print("SOLVED LEFT MATRIX", left)
         print("SOLVED RIGHT MATRIX", right)
         E.insert(0, 0)

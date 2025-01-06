@@ -1,9 +1,8 @@
 from galoisfield import GaloisField
 from reedsolomon import ReedSolomon
-from gaussjordan import GaussJordan
-
 
 class Main:
+
     def __init__(self):
         self.gf = GaloisField()
         self.rs = ReedSolomon(7, 3)
@@ -29,11 +28,11 @@ class Main:
 
         right_matrix = [1, 2]
 
-        GaussJordan.calculate(left_matrix, right_matrix)
+        #GaussJordan.calculate(left_matrix, right_matrix)
         print(right_matrix)
 
         print("ENCODED MESSAGE ", self.rs.encode_as_evaluations([1, 2, 3]))
-        print(self.rs.berlekamp_welch_decode([6, 5, 5, 6, 1, 2, 2]))
+        print(self.rs.berlekamp_welch_decode([0, 3, 5, 6, 1, 2, 2]))
 
 
 if __name__ == "__main__":

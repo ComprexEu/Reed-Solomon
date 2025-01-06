@@ -5,7 +5,7 @@ class GaussJordan:
     @staticmethod
     def calculate(leftmatrix, rightmatrix):
 
-        n= len(leftmatrix)
+        n = len(leftmatrix)
         gf = GaloisField()
 
         for i in range(n):
@@ -15,7 +15,7 @@ class GaussJordan:
                     c += 1
                 # If no non-zero element is found, end the algorithm
                 if (i + c) == n:
-                    break
+                    raise ValueError("Linear system is unsolvable")
 
                 # Swap rows in the matrix
                 leftmatrix[i], leftmatrix[i+c] = leftmatrix[i+c], leftmatrix[i]
