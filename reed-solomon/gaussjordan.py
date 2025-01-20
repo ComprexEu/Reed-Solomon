@@ -15,7 +15,9 @@ class GaussJordan:
                     c += 1
                 # If no non-zero element is found, end the algorithm
                 if (i + c) == n:
-                    raise ValueError("Linear system is unsolvable")
+                    if rightmatrix[i] != float('-inf'):
+                        raise ValueError("Linear system is unsolvable")
+                continue
 
                 # Swap rows in the matrix
                 leftmatrix[i], leftmatrix[i+c] = leftmatrix[i+c], leftmatrix[i]
@@ -39,7 +41,7 @@ class GaussJordan:
 
                     # Update right matrix
                     rightmatrix[j] = gf.add(rightmatrix[j], gf.mul(rightmatrix[i], p))
-        print("SOLVED LEFT MATRIX", leftmatrix)
-        print("SOLVED RIGHT MATRIX", rightmatrix)
+        #print("SOLVED LEFT MATRIX", leftmatrix)
+        #print("SOLVED RIGHT MATRIX", rightmatrix)
 
         return rightmatrix

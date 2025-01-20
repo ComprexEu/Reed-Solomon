@@ -68,7 +68,7 @@ class ReedSolomon:
 
         # num_of_errors - przy 10 błędach = 0, przy 9 błędach = 1 itd.
 
-        print("RECEIVED MESSAGE ", received_message)
+        #print("RECEIVED MESSAGE ", received_message)
         left = []
         right = []
 
@@ -90,8 +90,8 @@ class ReedSolomon:
             left.append(q + e)
             right.append(r)
 
-        print("RIGHT MATRIX", right)
-        print("LEFT MATRIX", left)
+        #print("RIGHT MATRIX", right)
+        #print("LEFT MATRIX", left)
 
         return left, right
 
@@ -116,14 +116,14 @@ class ReedSolomon:
                 num_of_errors += 1
 
 
-        print("SOLVED LEFT MATRIX", left)
-        print("SOLVED RIGHT MATRIX", right)
+        #print("SOLVED LEFT MATRIX", left)
+        #print("SOLVED RIGHT MATRIX", right)
         E.insert(0, 0)
-        print("Q: ", Q)
-        print("E: ", E)
+        #print("Q: ", Q)
+        #print("E: ", E)
 
         message_polynomial = self.gf.poly_div(Q, E)
-        print(message_polynomial)
+        #print(message_polynomial)
 
         # znajdowanie miejsc błedów
         errors_to_correct = []
@@ -133,7 +133,7 @@ class ReedSolomon:
 
         # poprawianie błędów
         decoded_message = received_message
-        print("ERRORS TO CORRECT ", errors_to_correct)
+        #print("ERRORS TO CORRECT ", errors_to_correct)
 
         for i in range(len(errors_to_correct)):
             if errors_to_correct[i] == float('-inf'):

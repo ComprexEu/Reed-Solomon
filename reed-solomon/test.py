@@ -1,14 +1,13 @@
 from reedsolomon import ReedSolomon
 import random
 
-
 def encode_test(message):
     reed_solomon = ReedSolomon(31,11)
     return reed_solomon.encode(message)
 
-def decode_test(message):
+def simple_decode_test(message):
     reed_solomon = ReedSolomon(31,11)
-    return reed_solomon.decode(message)
+    return reed_solomon.simple_decode(message)
 
 def random_number(forbiden_number):
     #nie powtarza sie ta sama cyfra wmiejscu, w ktorym była przed uszkodzeniem
@@ -35,14 +34,14 @@ def get_error(encoded_message, numbers_of_erros, neighbourhood):
             list_of_indexes.remove(index)
     return encoded_message
 
-def test_of_decoder(message, numbers_of_erros, neighbourhood,number_of_test):
+def test_of_simple_decoder(message, numbers_of_erros, neighbourhood, number_of_test):
     encoded_message = encode_test(message)
     print(encoded_message)
     number_of_failrules = 0
     number_of_undecodable = 0  #oile istnieje to slowo xd
     for i in range(number_of_test):
         harmed_message = get_error(encoded_message, numbers_of_erros, neighbourhood)
-        decoded_message = decode_test(harmed_message)
+        decoded_message = simple_decode_test(harmed_message)
         if decoded_message != encoded_message:
             if decoded_message == None:
                 number_of_undecodable += 1
@@ -55,7 +54,7 @@ def test_of_decoder(message, numbers_of_erros, neighbourhood,number_of_test):
     return number_of_failrules, number_of_undecodable
 
 num_of_tests = 1000
-num_of_f, num_of_und  = test_of_decoder([1,2,3,4,5,6,7,8,9,10,11],7,False,num_of_tests)
-print("nieodkodowane",num_of_und)
-print("niepoprawnie odkodowane",num_of_f)
-print("poprawnie odkodowane", num_of_tests - num_of_f - num_of_und )
+num_of_f, num_of_und  = test_of_simple_decoder([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 7, False, num_of_tests)
+print("Prosty nieodkodowane",num_of_und)
+print("Prosty niepoprawnie odkodowane",num_of_f)
+print("Prosty poprawnie odkodowane", num_of_tests - num_of_f - num_of_und )
