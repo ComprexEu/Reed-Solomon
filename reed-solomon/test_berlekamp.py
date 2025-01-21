@@ -94,7 +94,7 @@ def test_with_bundle_errors(encoded_message, numbers_of_erros, distance_between_
 #-----------TESTY--------------------------------------------------------
 
 Num_of_errors = [1,2,3,4,5,6,7,8,9,10,11,12,20,25]
-num_of_tests = 10
+num_of_tests = 100
 Percent_of_corrected = []
 
 message = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]

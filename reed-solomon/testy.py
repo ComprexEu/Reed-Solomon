@@ -2,17 +2,15 @@ from reedsolomon import ReedSolomon
 import random
 import matplotlib.pyplot as plt
 import numpy as np
+reed_solomon = ReedSolomon(31,11)
 
 def encode_test(message):
-    reed_solomon = ReedSolomon(31,11)
     return reed_solomon.encode(message)
 
 def simple_decode_test(message):
-    reed_solomon = ReedSolomon(31,11)
     return reed_solomon.simple_decode(message)
 
 def berlekamp_decode_test(message):
-    reed_solomon = ReedSolomon(31,11)
     return reed_solomon.berlekamp_welch_decode(message)
 
 def random_number(forbiden_number):
@@ -56,75 +54,81 @@ def get_bundle_error(encoded_message, numbers_of_erros, start_index, end_index):
         list_of_allowed_indexes.remove(index)
     return encoded_message
 
-def test_of_random_error(message, numbers_of_erros, number_of_test, simple_decoder = True):
-    if simple_decoder:
-        encoded_message = encode_test(message)
-        number_of_failrules = 0
-        number_of_undecodable = 0  #o ile istnieje to slowo xd
-        for i in range(number_of_test):
-            harmed_message = get_random_error(encoded_message, numbers_of_erros)
-            decoded_message = simple_decode_test(harmed_message)
-            if decoded_message != encoded_message:
-                if decoded_message == None:
-                    number_of_undecodable += 1
-                else:
-                    number_of_failrules += 1
+def test_of_random_error_simple(message, numbers_of_erros, number_of_test):
 
+    number_of_failrules = 0
+    number_of_undecodable = 0  # o ile istnieje to slowo xd
+    encoded_message = list(encode_test(message))
+
+    for i in range(number_of_test):
+        harmed_message = get_random_error(encoded_message, numbers_of_erros)
+        decoded_message = simple_decode_test(harmed_message)
+        if decoded_message != encoded_message:
+            if decoded_message == None:
+                number_of_undecodable += 1
+            else:
+                number_of_failrules += 1
+    return number_of_failrules, number_of_undecodable
                 #print(harmed_message)
                 #print(decoded_message)
                 #print("")
-        return number_of_failrules, number_of_undecodable
-    else:
-        encoded_message = encode_test(message)
-        number_of_failrules = 0
-        number_of_undecodable = 0  # o ile istnieje to slowo xd
-        for i in range(number_of_test):
-            harmed_message = get_random_error(encoded_message, numbers_of_erros)
-            decoded_message = berlekamp_decode_test(harmed_message)
-            if decoded_message != encoded_message:
-                if decoded_message == None:
-                    number_of_undecodable += 1
-                else:
-                    number_of_failrules += 1
+
+def test_of_random_error_berklamp(message, numbers_of_erros, number_of_test):
+    number_of_failrules = 0
+    number_of_undecodable = 0
+    encoded_message = reed_solomon.encode_as_evaluations(message)
+
+    for i in range(number_of_test):
+        harmed_message = get_random_error(encoded_message, numbers_of_erros)
+        decoded_message = berlekamp_decode_test(harmed_message)
+        if decoded_message != encoded_message:
+            if decoded_message == None:
+                number_of_undecodable += 1
+            else:
+                number_of_failrules += 1
 
                 # print(harmed_message)
                 # print(decoded_message)
                 # print("")
-        return number_of_failrules, number_of_undecodable
+    return number_of_failrules, number_of_undecodable
 
-def test_with_bundle_errors(message, numbers_of_erros, distance_between_errors, number_of_test, simple_decoder = True):
-    encoded_message = list(encode_test(message))
+def test_with_bundle_errors_simple(message, numbers_of_erros, distance_between_errors, number_of_test):
+
     number_of_failrules = 0
     number_of_undecodable = 0  # oile istnieje to slowo xd
-    if simple_decoder:
-        for i in range(number_of_test):
-            start_index = random.randint(0, len(encoded_message) - distance_between_errors - 1)
-            end_index = start_index + distance_between_errors
-            harmed_message = get_bundle_error(encoded_message, numbers_of_erros, start_index, end_index)
-            decoded_message = simple_decode_test(harmed_message)
-            if decoded_message != encoded_message:
-                if decoded_message == None:
-                    number_of_undecodable += 1
-                else:
-                    number_of_failrules += 1
+    encoded_message = list(encode_test(message))
+    for i in range(number_of_test):
+        start_index = random.randint(0, len(encoded_message) - distance_between_errors - 1)
+        end_index = start_index + distance_between_errors
+        harmed_message = get_bundle_error(encoded_message, numbers_of_erros, start_index, end_index)
+        decoded_message = simple_decode_test(harmed_message)
+        if decoded_message != encoded_message:
+            if decoded_message == None:
+                number_of_undecodable += 1
+            else:
+                number_of_failrules += 1
 
+    return number_of_failrules, number_of_undecodable
                 #print(harmed_message)
                 #print(decoded_message)
                 #print("")
 
-    if not simple_decoder:
-        reed_solomon = ReedSolomon(31, 11)
-        for i in range(number_of_test):
-            start_index = random.randint(0, len(encoded_message) - distance_between_errors - 1)
-            end_index = start_index + distance_between_errors
-            harmed_message = get_bundle_error(encoded_message, numbers_of_erros, start_index, end_index)
-            decoded_message = reed_solomon.berlekamp_welch_decode(harmed_message)
-            print(reed_solomon.berlekamp_welch_decode(harmed_message))
-            if decoded_message != encoded_message:
-                if decoded_message == None:
-                    number_of_undecodable += 1
-                else:
-                    number_of_failrules += 1
+def test_with_bundle_errors_berlekamp(message, numbers_of_erros, distance_between_errors, number_of_test):
+    number_of_failrules = 0
+    number_of_undecodable = 0
+    encoded_message = reed_solomon.encode_as_evaluations(message)
+
+    for i in range(number_of_test):
+        start_index = random.randint(0, len(encoded_message) - distance_between_errors - 1)
+        end_index = start_index + distance_between_errors
+        harmed_message = get_bundle_error(encoded_message, numbers_of_erros, start_index, end_index)
+        decoded_message = reed_solomon.berlekamp_welch_decode(harmed_message)
+        print(reed_solomon.berlekamp_welch_decode(harmed_message))
+        if decoded_message != encoded_message:
+            if decoded_message == None:
+                number_of_undecodable += 1
+            else:
+                number_of_failrules += 1
 
                 #print(harmed_message)
                 #print(decoded_message)
@@ -138,17 +142,18 @@ num_of_tests = 10
 
 message = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 print("Encoded message", encode_test(message))
+print("Encoded message berlekamp", reed_solomon.encode_as_evaluations(message))
 
 #-------------Bundle errors------------
 
 Percent_of_corrected_simple_bundle_error = []
 for num in Num_of_errors:
-    num_of_f, num_of_und  = test_with_bundle_errors(message, num, num+3, num_of_tests,True)
+    num_of_f, num_of_und  = test_with_bundle_errors_simple(message, num, num+3, num_of_tests)
     Percent_of_corrected_simple_bundle_error.append((num_of_tests - num_of_f - num_of_und) / num_of_tests)
 
 Percent_of_corrected_berlekamp_bundle_error = []
 for num in Num_of_errors:
-    num_of_f, num_of_und  = test_with_bundle_errors(message, num, num+3, num_of_tests,False)
+    num_of_f, num_of_und  = test_with_bundle_errors_berlekamp(message, num, num+3, num_of_tests)
     Percent_of_corrected_berlekamp_bundle_error.append((num_of_tests - num_of_f - num_of_und) / num_of_tests)
 
 
@@ -156,20 +161,20 @@ for num in Num_of_errors:
 
 Percent_of_corrected_simple_random_error = []
 for num in Num_of_errors:
-    num_of_f, num_of_und  = test_of_random_error(message, num, num_of_tests,True)
+    num_of_f, num_of_und  = test_of_random_error_simple(message, num, num_of_tests)
     Percent_of_corrected_simple_random_error.append((num_of_tests - num_of_f - num_of_und) / num_of_tests)
 
 Percent_of_corrected_berlekamp_random_error = []
 for num in Num_of_errors:
-    num_of_f, num_of_und  = test_of_random_error(message, num, num_of_tests,False)
+    num_of_f, num_of_und  = test_of_random_error_berklamp(message, num, num_of_tests)
     Percent_of_corrected_berlekamp_random_error.append((num_of_tests - num_of_f - num_of_und) / num_of_tests)
 
 
-plt.title("Bundle errors")
+plt.title("SIMPLE DECODER Bundle errors")
 plt.xlabel("Number of errors")
 plt.ylabel("Percent of corrected")
-plt.plot(Num_of_errors, 100 * np.array(Percent_of_corrected_berlekamp_bundle_error), color ='blue', label = "Berlekamp-Welch decoder")
-plt.scatter(Num_of_errors, 100 * np.array(Percent_of_corrected_berlekamp_bundle_error), color ='blue')
+#plt.plot(Num_of_errors, 100 * np.array(Percent_of_corrected_berlekamp_bundle_error), color ='blue', label = "Berlekamp-Welch decoder")
+#plt.scatter(Num_of_errors, 100 * np.array(Percent_of_corrected_berlekamp_bundle_error), color ='blue')
 plt.plot(Num_of_errors, 100 * np.array(Percent_of_corrected_simple_bundle_error), color ='red', label = "Simple decoder")
 plt.scatter(Num_of_errors, 100 * np.array(Percent_of_corrected_simple_bundle_error), color ='red')
 plt.legend()
@@ -225,7 +230,7 @@ for num in Num_of_errors:
     num_of_f, num_of_und  = test_with_bundle_errors(encoded_message, num, num+3, num_of_tests)
     Percent_of_corrected.append((num_of_tests - num_of_f - num_of_und)/num_of_tests)
 
-plt.title("BERLEKAMP-WELCH DECODER")
+plt.title("BERLEKAMP-WELCH DECODER Bundle errors")
 plt.xlabel("Number of errors")
 plt.ylabel("Percent of corrected")
 plt.plot(Num_of_errors, 100*np.array(Percent_of_corrected),color = 'blue')

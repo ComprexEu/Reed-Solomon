@@ -17,7 +17,7 @@ class GaussJordan:
                 if (i + c) == n:
                     if rightmatrix[i] != float('-inf'):
                         raise ValueError("Linear system is unsolvable")
-                continue
+                    continue
 
                 # Swap rows in the matrix
                 leftmatrix[i], leftmatrix[i+c] = leftmatrix[i+c], leftmatrix[i]

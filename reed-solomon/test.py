@@ -53,7 +53,7 @@ def test_of_simple_decoder(message, numbers_of_erros, neighbourhood, number_of_t
             #print("")
     return number_of_failrules, number_of_undecodable
 
-num_of_tests = 1000
+num_of_tests = 10
 num_of_f, num_of_und  = test_of_simple_decoder([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 7, False, num_of_tests)
 print("Prosty nieodkodowane",num_of_und)
 print("Prosty niepoprawnie odkodowane",num_of_f)
