@@ -20,7 +20,7 @@ class GaloisField:
         self.elem_to_exp[0] = float('-inf')
 
     def add(self, a, b):
-        return self.elem_to_exp[self.exp_to_elem[a] ^ self.exp_to_elem[b]]
+        return self.elesm_to_exp[self.exp_to_elem[a] ^ self.exp_to_elem[b]]
 
     def mul(self, a, b):
         if a == float('-inf') or b == float('-inf'):
