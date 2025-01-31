@@ -20,7 +20,7 @@ class GaloisField:
         self.elem_to_exp[0] = float('-inf')
 
     def add(self, a, b):
-        return self.elesm_to_exp[self.exp_to_elem[a] ^ self.exp_to_elem[b]]
+        return self.elem_to_exp[self.exp_to_elem[a] ^ self.exp_to_elem[b]]
 
     def mul(self, a, b):
         if a == float('-inf') or b == float('-inf'):
@@ -87,3 +87,56 @@ class GaloisField:
         for i in range(p_deg + 1):  # pi * x^i
             result = self.add(result, self.mul(p[i], self.pow(x, p_deg - i)))
         return result
+
+    def lagrange_interpolation(self, points):
+        """
+        Perform Lagrange interpolation in GF(2^5).
+        points: List of tuples (x, y), where x and y are powers of alpha.
+        Returns the coefficients of the interpolated polynomial.
+        """
+        n = len(points)
+        coefficients = [float('-inf')] * n  # Initialize coefficients to 0 (in exponent domain)
+
+        for i in range(n):
+            xi, yi = points[i]
+            term = [0]  # Start with 1 (x^0), represented as 0 in exponent domain
+
+            for j in range(n):
+                if j != i:
+                    xj, _ = points[j]
+                    # Compute (x - xj) / (xi - xj)
+                    # (x - xj) is represented as [xj, 1] in polynomial form
+                    # (xi - xj) is the denominator
+                    denominator = self.add(xi, xj)  # xi - xj
+                    if denominator == float('-inf'):
+                        raise ValueError("Duplicate points or invalid interpolation.")
+                    inv_denominator = self.exp_to_elem[self.div(0, self.elem_to_exp[denominator])]
+                    term = self.poly_multiply(term, [xj, 0])  # Multiply by (x - xj)
+                    term = [self.mul(coeff, inv_denominator) for coeff in term]
+
+            # Multiply term by yi and add to coefficients
+            term = [self.mul(coeff, yi) for coeff in term]
+            coefficients = [self.add(c, t) for c, t in zip(coefficients, term)]
+
+        return coefficients
+
+    def encode_message(self, message, codeword_length):
+        """
+        Encode a message using polynomial interpolation.
+        message: List of powers of alpha.
+        codeword_length: Desired length of the codeword.
+        """
+        # Convert message to points (x, y), where x is the index and y is the message value
+        points = [(i, message[i]) for i in range(len(message))]
+
+        # Perform Lagrange interpolation to find the polynomial
+        coefficients = self.lagrange_interpolation(points)
+
+        # Evaluate the polynomial at higher powers of alpha
+        codeword = message.copy()
+        for i in range(len(message), codeword_length):
+            x = i
+            y = self.calculate_poly(coefficients, x)
+            codeword.append(y)
+
+        return codeword

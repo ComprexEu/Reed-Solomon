@@ -1,3 +1,5 @@
+from eyed3.utils import formatTime
+
 from galoisfield import GaloisField
 from gaussjordan import GaussJordan
 #import gaussjordan
@@ -57,6 +59,35 @@ class ReedSolomon:
             decoded_message.pop(len(decoded_message) - 1)
 
             iterator += 1
+        return None
+
+    def lagrange_interpolation(self, x_values, y_values, x):
+
+        total = 0 # wielomian końcowy interpolacji
+        k = len(x_values)
+        for i in range(k):
+            # Obliczanie L_i(x)
+            term = y_values[i]
+            for j in range(k):
+                if i != j:
+                    #Równanie zapisane poniżej ma taką postać - term *= (x - x_values[j]) / (x_values[i] - x_values[j])
+                    term = self.gf.poly_multiply(term, self.gf.poly_div((self.gf.add(x,x_values[j])),self.gf.add(x_values[i],x_values[j])))
+            total = self.gf.add(total, term)
+
+        return total
+
+
+    def encode_as_lagrange_interpolation(self, message):
+        k = len(message)  # Liczba symboli w wiadomości
+        x_values = list() # Przypisujemy x = [1, 2, 3, ..., k]
+        for i in range(k):
+            x_values.append(i)
+        y_values = message  # Odpowiednie wartości y
+        # Wyznaczanie funkcji opisującej zbiór punktów wiadomości
+        # Generowanie n punktów kodowych
+        encoded_points = [(i, self.lagrange_interpolation(x_values, y_values, i)) for i in range(0, self.n)]
+
+        return encoded_points
 
     def encode_as_evaluations(self, message):
         encoded = []
@@ -64,20 +95,18 @@ class ReedSolomon:
             encoded.append(self.gf.calculate_poly(message, x))
         return encoded
 
-    def construct_matrices(self, received_message, num_of_errors):
-
-        # num_of_errors - przy 10 błędach = 0, przy 9 błędach = 1 itd.
+    def construct_matrices(self, received_message):
 
         #print("RECEIVED MESSAGE ", received_message)
         left = []
         right = []
 
-        for i in range(self.n - 2*num_of_errors):
+        for i in range(self.n):
             ai = i
             wi = received_message[i]
 
-            q = [float('-inf')] * (self.k + self.t - num_of_errors)
-            e = [float('-inf')] * (self.t + 1 - num_of_errors)
+            q = [float('-inf')] * (self.k + self.t)
+            e = [float('-inf')] * (self.t + 1)
 
             for j in range(len(q)):  # współczynniki q
                 q[j] = self.gf.pow(ai, len(q) - j - 1)
@@ -90,53 +119,33 @@ class ReedSolomon:
             left.append(q + e)
             right.append(r)
 
-        #print("RIGHT MATRIX", right)
-        #print("LEFT MATRIX", left)
-
         return left, right
 
-    def solve_linear_system(self, left, right, num_of_errors):
-
-        rightmatrix =  GaussJordan.calculate(left, right)
-        Q = rightmatrix[:self.k + self.t - num_of_errors]
-        E = rightmatrix[self.k + self.t - num_of_errors:]
+    def solve_linear_system(self, left, right):
+        rightmatrix = GaussJordan.calculate(left, right)
+        Q = rightmatrix[:self.k + self.t]
+        E = rightmatrix[self.k + self.t:]
         return Q, E
 
     def berlekamp_welch_decode(self, received_message):
 
-        num_of_errors = 0
+        try:
+            left, right = self.construct_matrices(received_message)
+            Q, E = self.solve_linear_system(left, right)
+        except ValueError:
+            print("Decoding failed: Too many errors to correct")
+            return None  # or raise an exception if needed
 
-        while True:
-            try:
-                left, right = self.construct_matrices(received_message, num_of_errors)
-                Q, E = self.solve_linear_system(left, right, num_of_errors)
-                break
-            except ValueError:
-                # gaussjordan jest nierozwiązywalny i spr. dla mniejszej liczby błędów
-                num_of_errors += 1
-
-
-        #print("SOLVED LEFT MATRIX", left)
-        #print("SOLVED RIGHT MATRIX", right)
         E.insert(0, 0)
-        #print("Q: ", Q)
-        #print("E: ", E)
 
         message_polynomial = self.gf.poly_div(Q, E)
-        #print(message_polynomial)
 
-        # znajdowanie miejsc błedów
-        errors_to_correct = []
+        decoded_message = []
+        error_count = 0
+
         for i in range(self.n):
-            potential_error = self.gf.calculate_poly(E, i)
-            errors_to_correct.append(potential_error)
+            decoded_message.append(self.gf.calculate_poly(message_polynomial, i))
+            if decoded_message[i] != received_message[i]:
+                error_count += 1
 
-        # poprawianie błędów
-        decoded_message = received_message
-        #print("ERRORS TO CORRECT ", errors_to_correct)
-
-        for i in range(len(errors_to_correct)):
-            if errors_to_correct[i] == float('-inf'):
-                decoded_message[i] = self.gf.calculate_poly(message_polynomial, i)
-
-        return decoded_message
+        return decoded_message if error_count <= 10 else None

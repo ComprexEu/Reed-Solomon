@@ -1,3 +1,5 @@
+from numpy.random import randint
+
 from reedsolomon import ReedSolomon
 import random
 import matplotlib.pyplot as plt
@@ -80,6 +82,7 @@ def test_with_bundle_errors(encoded_message, numbers_of_erros, distance_between_
         end_index = start_index + distance_between_errors
         harmed_message = get_bundle_error(encoded_message, numbers_of_erros, start_index, end_index)
         decoded_message = reed_solomon.berlekamp_welch_decode(harmed_message)
+        #print(decoded_message)
         if decoded_message != encoded_message:
             if decoded_message == None:
                 number_of_undecodable += 1
@@ -91,28 +94,42 @@ def test_with_bundle_errors(encoded_message, numbers_of_erros, distance_between_
             #print("")
     return number_of_failrules, number_of_undecodable
 
+def generate_random_message(message_length):
+    return [(randint(0, 31)) for i in range(message_length)]
+
 #-----------TESTY--------------------------------------------------------
 
 Num_of_errors = [1,2,3,4,5,6,7,8,9,10,11,12,20,25]
-num_of_tests = 100
+num_of_tests = 1000
 Percent_of_corrected = []
-
 message = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 reed_solomon = ReedSolomon(31,11)
 encoded_message = reed_solomon.encode_as_evaluations(message)
-print(encoded_message)
+total_number_of_failrules = 0
+total_number_of_undecodable = 0
 
-for num in Num_of_errors:
-    num_of_f, num_of_und  = test_with_bundle_errors(encoded_message, num, num+3, num_of_tests)
-    Percent_of_corrected.append((num_of_tests - num_of_f - num_of_und)/num_of_tests)
 
-plt.title("BERLEKAMP-WELCH DECODER")
-plt.xlabel("Number of errors")
-plt.ylabel("Percent of corrected")
-plt.plot(Num_of_errors, 100*np.array(Percent_of_corrected),color = 'blue')
-plt.scatter(Num_of_errors, 100*np.array(Percent_of_corrected), color = 'blue')
-plt.grid(True)
-plt.show()
+for i in range(num_of_tests):
+    encoded_message = reed_solomon.encode_as_evaluations(generate_random_message(11))
+    num_of_f, num_of_und  = test_with_bundle_errors(encoded_message, 10, 10+3, 1)
+    total_number_of_failrules += num_of_f
+    total_number_of_undecodable += num_of_und
+
+print("Found but not corrected: ",total_number_of_undecodable)
+print("Corrected but wrong: ",total_number_of_failrules)
+# for num in Num_of_errors:
+#     message = generate_random_message(num)
+#     encoded_message = reed_solomon.encode_as_evaluations(message)
+#     num_of_f, num_of_und  = test_with_bundle_errors(encoded_message, num, num+3, num_of_tests)
+#     Percent_of_corrected.append((num_of_tests - num_of_f - num_of_und)/num_of_tests)
+#
+# plt.title("BERLEKAMP-WELCH DECODER")
+# plt.xlabel("Number of errors")
+# plt.ylabel("Percent of corrected")
+# plt.plot(Num_of_errors, 100*np.array(Percent_of_corrected),color = 'blue')
+# plt.scatter(Num_of_errors, 100*np.array(Percent_of_corrected), color = 'blue')
+# plt.grid(True)
+# plt.show()
 
 print(Percent_of_corrected)
 print(Num_of_errors)

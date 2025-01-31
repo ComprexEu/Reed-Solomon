@@ -13,17 +13,17 @@ class GaussJordan:
                 c = 1
                 while (i + c) < n and leftmatrix[i + c][i] == float('-inf'):
                     c += 1
-                # If no non-zero element is found, end the algorithm
+                # Jeśli znaleziono jakiś niezerowy element, zakończ algorytm
                 if (i + c) == n:
                     if rightmatrix[i] != float('-inf'):
                         raise ValueError("Linear system is unsolvable")
                     continue
 
-                # Swap rows in the matrix
+                # Zamiana wierszy w macierzy
                 leftmatrix[i], leftmatrix[i+c] = leftmatrix[i+c], leftmatrix[i]
                 rightmatrix[i], rightmatrix[i+c] = rightmatrix[i+c], rightmatrix[i]
 
-            # Normalize pivot row
+            # Normalizacja wiersza obrotu
             pivot = leftmatrix[i][i]
             if pivot != float('-inf'):
                 for k in range(n):
@@ -32,16 +32,13 @@ class GaussJordan:
 
             for j in range(n):
                 if i != j:
-                    # Calculate scaling factor
+                    # Wyliczenie wartości wektora skalującego
                     p = gf.div(leftmatrix[j][i], leftmatrix[i][i])
 
-                    # Eliminate column entries
+                    # Eliminacja columny
                     for k in range(n):
                         leftmatrix[j][k] = gf.add(leftmatrix[j][k], gf.mul(leftmatrix[i][k], p))
 
-                    # Update right matrix
                     rightmatrix[j] = gf.add(rightmatrix[j], gf.mul(rightmatrix[i], p))
-        #print("SOLVED LEFT MATRIX", leftmatrix)
-        #print("SOLVED RIGHT MATRIX", rightmatrix)
 
         return rightmatrix

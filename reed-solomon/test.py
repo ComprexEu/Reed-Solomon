@@ -36,7 +36,7 @@ def get_error(encoded_message, numbers_of_erros, neighbourhood):
 
 def test_of_simple_decoder(message, numbers_of_erros, neighbourhood, number_of_test):
     encoded_message = encode_test(message)
-    print(encoded_message)
+    #print(encoded_message)
     number_of_failrules = 0
     number_of_undecodable = 0  #oile istnieje to slowo xd
     for i in range(number_of_test):
@@ -53,8 +53,25 @@ def test_of_simple_decoder(message, numbers_of_erros, neighbourhood, number_of_t
             #print("")
     return number_of_failrules, number_of_undecodable
 
-num_of_tests = 10
-num_of_f, num_of_und  = test_of_simple_decoder([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 7, False, num_of_tests)
-print("Prosty nieodkodowane",num_of_und)
-print("Prosty niepoprawnie odkodowane",num_of_f)
-print("Prosty poprawnie odkodowane", num_of_tests - num_of_f - num_of_und )
+def generate_random_message(message_length):
+    return [(generate_body_value(31)) for i in range(message_length)]
+
+def generate_body_value(body_size):
+    value = random.randint(-1, body_size - 1)
+    if(value < 0):
+        return float('-inf')
+    else:
+        return value
+
+num_of_tests = 10000
+#num_of_f, num_of_und  = test_of_simple_decoder([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 3, False, 0)
+total_number_of_failrules = 0
+total_number_of_undecodable = 0
+for i in range(num_of_tests):
+    num_of_failrules, num_of_undecodable = test_of_simple_decoder(generate_random_message(11), 25, False, 1)
+    total_number_of_failrules += num_of_failrules
+    total_number_of_undecodable += num_of_undecodable
+
+print("Prosty nieodkodowane",total_number_of_undecodable)
+print("Prosty niepoprawnie odkodowane",total_number_of_failrules)
+print("Prosty poprawnie odkodowane", num_of_tests - total_number_of_failrules - total_number_of_undecodable )
